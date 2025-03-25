@@ -1,11 +1,5 @@
-<<<<<<< HEAD
 pandas
 matplotlib
 seaborn
 streamlit
-=======
-pandas
-matplotlib
-seaborn
-streamlit
->>>>>>> origin/revisi
+
