@@ -15,95 +15,39 @@ st.title("Dashboard Kualitas Udara Kota Beijing")
 st.sidebar.header("Navigasi")
 
 menu = st.sidebar.radio("Pilih Visualisasi: ", [
-    "Tren Polusi Harian",
+    "Korelasi Polutan dengan Temperatur Suhu",
+    "Tren Polusi"
 ])
 
-if menu == "Tren Polusi Harian":
-    min_date = df['datetime'].min()
-    max_date = df['datetime'].max()
-
-    start_date= st.date_input(
-        label='Rentang Waktu',
-        min_value=min_date,
-        max_value=max_date,
-        value=(min_date)
-    )
-
-    daily_df = df[df["datetime"].dt.date == start_date]
-
-    pollutant_type = st.selectbox(
-        label='Pilih Jenis Polutan',
-        options = pollutants
-    )
-
-    fig, ax = plt.subplots(figsize=(12, 5))
-    if pollutant_type == 'PM2.5':
-        fig, ax = plt.subplots(figsize=(12, 5))
-        if not daily_df.empty:
-            st.subheader(f"Tren Polutan {pollutant_type} pada {start_date}")
-
-            # Plot tren polutan dalam sehari      
-            sns.lineplot(x=daily_df["datetime"].dt.hour, y=daily_df["PM2.5"], label="PM2.5", color="red")
-            plt.xlabel("Jam")
-            plt.ylabel(f"Konsentrasi {pollutant_type}")
-            plt.title(f"Polutan {pollutant_type} pada {start_date} (Per Jam)")
-            plt.xticks(range(0, 24))
-            plt.legend()
-            plt.grid(True)
-        
-
-    elif pollutant_type == 'PM10':
-        if not daily_df.empty:
-            st.subheader(f"Tren Polutan {pollutant_type} pada {start_date}")
-
-            # Plot tren polutan dalam sehari      
-            sns.lineplot(x=daily_df["datetime"].dt.hour, y=daily_df["PM10"], label="PM10", color="blue")
-            plt.xlabel("Jam")
-            plt.ylabel(f"Konsentrasi {pollutant_type}")
-            plt.title(f"Polutan {pollutant_type} pada {start_date} (Per Jam)")
-            plt.xticks(range(0, 24))
-            plt.legend()
-            plt.grid(True)
+if menu == "Korelasi Polutan dengan Temperatur Suhu":
+    st.header("Korelasi Polutan dengan Temperatur Suhu")
+    st.write("Menampilkan korelasi antara polutan (PM2.5, PM10, SO2, NO2, CO) dengan Temperatur Suhu.")
+    correlation_matrix = df[["PM2.5", "PM10", "SO2", "NO2", "CO", "TEMP"]].corr()
     
+    fig, ax = plt.subplots(figsize=(12, 6))
+    sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
+    ax.set_title("Korelasi Polutan dengan Suhu")
+    st.pyplot(fig)
+
+    st.markdown("""
+    ### Kesimpulan
+    ##### Hubungan Antar Polutan
+    1. **PM2.5 dan PM10** memiliki korelasi sangat tinggi (**0.89**) yang menunjukkan bahwa jika kadar PM2.5 meningkat, PM10 juga cenderung meningkat.  
+    2. **CO** berkorelasi kuat dengan PM2.5 (**0.79**) dan PM10 (**0.71**) karena berasal dari sumber serupa seperti kendaraan dan industri.  
+    3. **NO2** berkorelasi cukup tinggi dengan PM2.5 (**0.66**) dan PM10 (**0.66**) yang juga berasal dari emisi kendaraan.  
+    4. **SO2** memiliki korelasi sedang dengan PM2.5 (**0.51**) dan PM10 (**0.50**) karena kemungkinan berasal dari sumber emisi yang berbeda.
     
-    elif pollutant_type == 'SO2':
-        if not daily_df.empty:
-            st.subheader(f"Tren Polutan {pollutant_type} pada {start_date}")
+    ##### Pengaruh Suhu (TEMP) terhadap Polutan
+    Suhu berkorelasi negatif dengan semua polutan yang dibuktikan dengan korelasi setiap polutan berikut ini:
 
-            # Plot tren polutan dalam sehari     
-            sns.lineplot(x=daily_df["datetime"].dt.hour, y=daily_df["SO2"], label="SO2", color="green")
-            plt.xlabel("Jam")
-            plt.ylabel(f"Konsentrasi {pollutant_type}")
-            plt.title(f"Polutan {pollutant_type} pada {start_date} (Per Jam)")
-            plt.xticks(range(0, 24))
-            plt.legend()
-            plt.grid(True)
-    
-    
-    elif pollutant_type == 'NO2':
-        if not daily_df.empty:
-            st.subheader(f"Tren Polutan {pollutant_type} pada {start_date}")
+    PM2.5 (-0.11) dan PM10 (-0.08) 
 
-            # Plot tren polutan dalam sehari      
-            sns.lineplot(x=daily_df["datetime"].dt.hour, y=daily_df["NO2"], label="NO2", color="purple")
-            plt.xlabel("Jam")
-            plt.ylabel(f"Konsentrasi {pollutant_type}")
-            plt.title(f"Polutan {pollutant_type} pada {start_date} (Per Jam)")
-            plt.xticks(range(0, 24))
-            plt.legend()
-            plt.grid(True)
-            
+    SO2 (-0.36), NO2 (-0.28), dan CO (-0.32) 
 
-    elif pollutant_type == 'CO':
-        if not daily_df.empty:
-            st.subheader(f"Tren Polutan {pollutant_type} pada {start_date}")
+    Dari korelasi tersebut dapat disimpulkan ketika suhu meningkat, kadar polutan cenderung menurun.
+    Hal tersebut dapat terjadi karena suhu yang lebih tinggi sering dikaitkan dengan atmosfer yang lebih aktif, sehingga polutan lebih cepat terdilusi atau terdorong ke lapisan atmosfer yang lebih tinggi.                
+    """)
 
-            # Plot tren polutan dalam sehari       
-            sns.lineplot(x=daily_df["datetime"].dt.hour, y=daily_df["CO"], label="CO", color="orange")
-            plt.xlabel("Jam")
-            plt.ylabel(f"Konsentrasi {pollutant_type}")
-            plt.title(f"Polutan {pollutant_type} pada {start_date} (Per Jam)")
-            plt.xticks(range(0, 24))
-            plt.legend()
-            plt.grid(True)
-st.pyplot(fig)
+elif menu == "Tren Polusi":
+    st.header("Korelasi Polutan dengan Temperatur Suhu")
+    st.write("Menampilkan tren setiap polutan (PM2.5, PM10, SO2, NO2, CO) dari dataset.")
