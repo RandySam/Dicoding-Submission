@@ -1,1 +1,1 @@
-https://beijingairqualities.streamlit.app/
+https://beijing-airqualities-revision.streamlit.app/
